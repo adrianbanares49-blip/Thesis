@@ -28,7 +28,7 @@ public class LetterTile : MonoBehaviour
     public void SetLetter(char letter)
     {
         this.letter = letter;
-        text.text = letter.ToString().ToUpper();
+        text.text = letter == '\0' ? "" :letter.ToString().ToUpper();
     }
     public void SetState(State state)
     {

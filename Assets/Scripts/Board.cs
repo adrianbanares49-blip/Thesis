@@ -42,6 +42,7 @@ public class Board : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI invalidWordText;
     public TextMeshProUGUI wordFoundText;
+    public GameObject retryButton;
 
     private void Awake()
     {
@@ -58,8 +59,9 @@ public class Board : MonoBehaviour
             enabled = false;
             return;
         }
-        invalidWordText.gameObject.SetActive(false); // ✅ hide on game start
+        invalidWordText.gameObject.SetActive(false); //  hide on game start
         wordFoundText.gameObject.SetActive(false);
+        retryButton.SetActive(false);
         lastSubmissionInvalid = false;       
 
         
@@ -93,6 +95,31 @@ public class Board : MonoBehaviour
             .Trim();
             //convert to small cases for comparison
     }
+
+    public void RetryGame()
+    {
+        rowIndex = 0;
+        columnIndex = 0;
+        wordFound = false;
+        lastSubmissionInvalid = false;
+
+        //hide text/btns
+        invalidWordText.gameObject.SetActive(false); 
+        wordFoundText.gameObject.SetActive(false); 
+        retryButton.SetActive(false); 
+
+        foreach (BoardRow row in rows)
+        {
+            foreach (LetterTile tile in row.tiles)
+            {
+                tile.SetLetter('\0');
+                tile.SetState(emptyState);
+            }
+        }
+
+        SetRandomWord();
+        enabled = true;
+    }        
 
     private void Update()
     {
@@ -234,6 +261,7 @@ public class Board : MonoBehaviour
         if (rowIndex >= rows.Length)
         {
             enabled = false;
+            retryButton.SetActive(true);
         }
     }
     //check if the word is valid
