@@ -15,7 +15,7 @@ public class Board : MonoBehaviour
         KeyCode.F, KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J,
         KeyCode.K, KeyCode.L, KeyCode.M, KeyCode.N, KeyCode.O,
         KeyCode.P, KeyCode.Q, KeyCode.R, KeyCode.S, KeyCode.T,
-        KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X, KeyCode.Y, 
+        KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X, KeyCode.Y,
         KeyCode.Z
     };
 
@@ -40,9 +40,12 @@ public class Board : MonoBehaviour
 
 
     [Header("UI")]
+    public Image invalidWordImage;
     public TextMeshProUGUI invalidWordText;
+    public Image wordFoundTextImage;
     public TextMeshProUGUI wordFoundText;
     public GameObject retryButton;
+
 
     private void Awake()
     {
@@ -59,12 +62,15 @@ public class Board : MonoBehaviour
             enabled = false;
             return;
         }
+        invalidWordImage.gameObject.SetActive(false);
         invalidWordText.gameObject.SetActive(false); //  hide on game start
+
+        wordFoundTextImage.gameObject.SetActive(false);
         wordFoundText.gameObject.SetActive(false);
         retryButton.SetActive(false);
-        lastSubmissionInvalid = false;       
+        lastSubmissionInvalid = false;
 
-        
+
         SetRandomWord();
     }
 
@@ -93,7 +99,7 @@ public class Board : MonoBehaviour
         word = solutions[UnityEngine.Random.Range(0, solutions.Length)]
             .ToLower()
             .Trim();
-            //convert to small cases for comparison
+        //convert to small cases for comparison
     }
 
     public void RetryGame()
@@ -103,10 +109,14 @@ public class Board : MonoBehaviour
         wordFound = false;
         lastSubmissionInvalid = false;
 
-        //hide text/btns
-        invalidWordText.gameObject.SetActive(false); 
-        wordFoundText.gameObject.SetActive(false); 
-        retryButton.SetActive(false); 
+        //hide text/
+        invalidWordImage.gameObject.SetActive(false);
+        invalidWordText.gameObject.SetActive(false);
+
+
+        wordFoundTextImage.gameObject.SetActive(false);
+        wordFoundText.gameObject.SetActive(false);
+        retryButton.SetActive(false);
 
         foreach (BoardRow row in rows)
         {
@@ -119,14 +129,14 @@ public class Board : MonoBehaviour
 
         SetRandomWord();
         enabled = true;
-    }        
+    }
 
     private void Update()
     {
         //stop input if the correct word is already inputted
         if (wordFound)
             return;
-            
+
         if (rowIndex >= rows.Length)
             return;
 
@@ -140,12 +150,13 @@ public class Board : MonoBehaviour
                 columnIndex--;
                 currentRow.tiles[columnIndex].SetLetter('\0');
                 currentRow.tiles[columnIndex].SetState(emptyState);
-             
-             if (lastSubmissionInvalid)
-             {
-                invalidWordText.gameObject.SetActive(false);
-                lastSubmissionInvalid = false;
-            }
+
+                if (lastSubmissionInvalid)
+                {
+                    invalidWordImage.gameObject.SetActive(false);
+                    invalidWordText.gameObject.SetActive(false);
+                    lastSubmissionInvalid = false;
+                }
             }
             return;
         }
@@ -168,7 +179,7 @@ public class Board : MonoBehaviour
                     .SetLetter(SUPPORTED_KEYS[i].ToString()[0]);
                 currentRow.tiles[columnIndex]
                     .SetState(occupiedState);
-                
+
                 columnIndex++;
                 break;
             }
@@ -178,11 +189,13 @@ public class Board : MonoBehaviour
     private void SubmitRow(BoardRow row)
     {
         // Clear previous error ONLY when Enter is pressed
+        invalidWordImage.gameObject.SetActive(false);
         invalidWordText.gameObject.SetActive(false);
         lastSubmissionInvalid = false;
 
         if (!IsValidWord(row.word))
         {
+            invalidWordImage.gameObject.SetActive(true);
             invalidWordText.gameObject.SetActive(true);
             lastSubmissionInvalid = true;
             return;
@@ -222,7 +235,7 @@ public class Board : MonoBehaviour
             }
         }
 
-         
+
         /* cannot check multiple same letters 
                 => cause confusion to players
 
@@ -246,10 +259,11 @@ public class Board : MonoBehaviour
         }
         */
 
-        if(row.word == word)
+        if (row.word == word)
         {
             //checking if the word is correect
             wordFound = true;
+            wordFoundTextImage.gameObject.SetActive(true);
             wordFoundText.gameObject.SetActive(true);
             enabled = false;
         }
@@ -267,13 +281,14 @@ public class Board : MonoBehaviour
     //check if the word is valid
     private bool IsValidWord(string word)
     {
-        for (int i = 0; i < validWords.Length;i++)
+        for (int i = 0; i < validWords.Length; i++)
         {
-            if(validWords[i].Trim() == word)
+            if (validWords[i].Trim() == word)
             {
                 return true;
             }
-        } return false;
+        }
+        return false;
     }
 
 
